@@ -1,20 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Пример: отмена, всплытие, координаты мыши</title>
+  <style>
+    #mouseArea {
+      margin-top: 20px;
+      width: 300px;
+      height: 150px;
+      background-color: #e0f7fa;
+      border: 2px solid #00796b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      user-select: none;
+    }
+    #parentDiv {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #c8e6c9;
+    }
+    #childDiv {
+      padding: 10px;
+      background-color: #a5d6a7;
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-    <button id="colorButton">Сменить цвет фона</button>
 
-    <script>
-        const button = document.getElementById('colorButton');
-        button.addEventListener('click', () => {
-            // Генерируем случайный цвет в формате HEX
-            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-            document.body.style.backgroundColor = randomColor;
-        });
-    </script>    
+  <h2>Отмена действия по умолчанию для формы</h2>
+  <form id="myForm">
+    <input type="text" name="username" placeholder="Введите имя" required />
+    <button type="submit">Отправить</button>
+  </form>
+  <div id="formMessage" style="color: red; margin-top: 10px;"></div>
+
+  <h2>Остановка всплытия для вложенных элементов</h2>
+  <div id="parentDiv">
+    Родительский блок (клик по нему выводит сообщение)
+    <div id="childDiv">Вложенный блок (клик по нему останавливает всплытие)</div>
+  </div>
+
+  <h2>Отображение координат мыши</h2>
+  <div id="mouseArea">Наведи мышь сюда</div>
+
+  <script>
+    // Отмена действия по умолчанию для формы
+    const form = document.getElementById('myForm');
+    const formMessage = document.getElementById('formMessage');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault(); // отменяем отправку формы
+      formMessage.textContent = `Форма не отправлена. Введено имя: ${form.username.value}`;
+      console.log('Отправка формы отменена');
+    });
+
+    // Остановка всплытия для вложенных элементов
+    const parentDiv = document.getElementById('parentDiv');
+    const childDiv = document.getElementById('childDiv');
+
+    parentDiv.addEventListener('click', () => {
+      console.log('Клик по родительскому блоку');
+      alert('Клик по родителю');
+    });
+
+    childDiv.addEventListener('click', (event) => {
+      event.stopPropagation(); // останавливаем всплытие
+      console.log('Клик по вложенному блоку, всплытие остановлено');
+      alert('Клик по вложенному блоку');
+    });
+
+    // Отображение координат мыши при движении над областью
+    const mouseArea = document.getElementById('mouseArea');
+
+    mouseArea.addEventListener('mousemove', (event) => {
+      // Получаем координаты относительно самого блока mouseArea
+      const rect = mouseArea.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      mouseArea.textContent = `Координаты мыши: X=${x.toFixed(0)}, Y=${y.toFixed(0)}`;
+    });
+
+    // При уходе мыши с области очищаем текст
+    mouseArea.addEventListener('mouseleave', () => {
+      mouseArea.textContent = 'Наведи мышь сюда';
+    });
+  </script>
+
 </body>
 </html>
